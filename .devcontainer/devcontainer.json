@@ -1,0 +1,48 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/docker-existing-dockerfile
+{
+  "name": "Existing Dockerfile",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python"
+      ]
+      // "settings": {
+      //   "editor.formatOnPaste": true,
+      //   "editor.formatOnSave": true,
+      //   "editor.formatOnSaveMode": "file",
+      //   "editor.formatOnType": true,
+      //   "lldb.executable": "/usr/bin/lldb"
+      // },
+      // "extensions": [
+      //   "mhutchie.git-graph",
+      //   "tamasfe.even-better-toml",
+      //   "mutantdino.resourcemonitor",
+      //   "yzhang.markdown-all-in-one",
+      //   "ms-vscode.cpptools",
+      //   "actboy168.tasks",
+      //   "eamodio.gitlens",
+      //   "Wokwi.wokwi-vscode",
+      //   "mesonbuild.mesonbuild",
+      //   "xaver.clang-format",
+      //   "ms-azuretools.vscode-docker"
+      // ]
+    }
+  },
+  "containerEnv": {
+    "DISPLAY": ":0"
+  }
+  // Features to add to the dev container. More info: https://containers.dev/features.
+  // "features": {},
+  // Use 'forwardPorts' to make a list of ports inside the container available locally.
+  // "forwardPorts": [],
+  // Uncomment the next line to run commands after the container is created.
+  // "postCreateCommand": "cat /etc/os-release",
+  // Configure tool-specific properties.
+  // "customizations": {},
+  // Uncomment to connect as an existing user other than the container default. More info: https://aka.ms/dev-containers-non-root.
+  // "remoteUser": "devcontainer"
+}
