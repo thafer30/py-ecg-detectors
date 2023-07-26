@@ -6,6 +6,7 @@ import pathlib
 from ecgdetectors import Detectors
 import os
 import struct
+import collections
 
 # max_samples = 2500
 # starting_sample = 1000
@@ -51,6 +52,69 @@ detectors = Detectors(fs)
 # ecg_buffer = buffer_one
 ecg_buffer = buffer_two
 # ecg_buffer = unfiltered_ecg
+
+filtered_buffer = np.array([], dtype=np.int16)
+
+newvalue = 0
+total = 0
+count = 0
+maxCount = 1024
+# maxCount = 250 * 60
+# tmp_buffer = np.array([], dtype=np.int16)
+# tmp_buffer = np.append(tmp_buffer, 0)
+
+tmp_buffer = collections.deque(maxlen = maxCount)
+# tmp_buffer.appendleft(0)
+
+# Quick averager
+for sample in ecg_buffer:
+    popped_value = 0
+
+    if count >= maxCount:
+        popped_value = tmp_buffer.popleft()
+    else:
+        count += 1
+    total += sample - popped_value
+
+    tmp_buffer.append(sample)
+
+    avg = total / count
+
+    filtered_value = sample - avg
+
+    filtered_buffer = np.append(filtered_buffer, filtered_value)
+
+accumulator = 0
+tempAvg = 0
+
+# Rolling Average w/ accumulator
+# for sample in ecg_buffer:
+
+#     if count == 0:
+#         accumulator = sample
+#         count += 1
+#     else:
+#         tempAvg = accumulator
+#         # Remove oldest value
+#         tempAvg -= accumulator / count
+#         # Add newest value
+#         tempAvg += sample / count
+#         if count < maxCount:
+#             count += 1
+#         accumulator = tempAvg
+
+#     filtered_buffer = np.append(filtered_buffer, sample - accumulator)
+
+plt.figure(figsize=(200,5))
+t = np.linspace(0, len(filtered_buffer) / fs, len(filtered_buffer))
+plt.plot(t, filtered_buffer)
+plt.title("Filtered ECG")
+plt.ylabel("ECG/mV")
+plt.xlabel("time/sec")
+plt.savefig(results_dir / "filtered.png")
+# plt.show()
+plt.close()
+
 
 for i in range(len(detectors.get_detector_list())):
     r_peaks = detectors.get_detector_list()[i][1](ecg_buffer)
