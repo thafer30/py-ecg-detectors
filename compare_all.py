@@ -58,7 +58,7 @@ filtered_buffer = np.array([], dtype=np.int16)
 newvalue = 0
 total = 0
 count = 0
-maxCount = 1024
+maxCount = 5
 # maxCount = 250 * 60
 # tmp_buffer = np.array([], dtype=np.int16)
 # tmp_buffer = np.append(tmp_buffer, 0)
@@ -111,38 +111,37 @@ plt.plot(t, filtered_buffer)
 plt.title("Filtered ECG")
 plt.ylabel("ECG/mV")
 plt.xlabel("time/sec")
-plt.savefig(results_dir / "filtered.png")
+plt.savefig(results_dir / f'filtered({str(maxCount)}).png')
 # plt.show()
 plt.close()
 
+# for i in range(len(detectors.get_detector_list())):
+#     r_peaks = detectors.get_detector_list()[i][1](ecg_buffer)
 
-for i in range(len(detectors.get_detector_list())):
-    r_peaks = detectors.get_detector_list()[i][1](ecg_buffer)
+#     # convert the sample number to time
+#     r_ts = np.array(r_peaks) / fs
 
-    # convert the sample number to time
-    r_ts = np.array(r_peaks) / fs
+#     if not os.path.isdir(results_dir / detectors.get_detector_list()[i][0]):
+#         os.makedirs(results_dir / detectors.get_detector_list()[i][0])
 
-    if not os.path.isdir(results_dir / detectors.get_detector_list()[i][0]):
-        os.makedirs(results_dir / detectors.get_detector_list()[i][0])
+#     plt.figure(figsize=(200,5))
+#     t = np.linspace(0, len(ecg_buffer) / fs, len(ecg_buffer))
+#     plt.plot(t, ecg_buffer)
+#     plt.plot(r_ts, ecg_buffer[r_peaks], "ro")
+#     plt.title("Detected R peaks" + detectors.get_detector_list()[i][0])
+#     plt.ylabel("ECG/mV")
+#     plt.xlabel("time/sec")
+#     plt.savefig(results_dir / detectors.get_detector_list()[i][0] / " peaks.png")
+#     # plt.show()
+#     plt.close()
 
-    plt.figure(figsize=(200,5))
-    t = np.linspace(0, len(ecg_buffer) / fs, len(ecg_buffer))
-    plt.plot(t, ecg_buffer)
-    plt.plot(r_ts, ecg_buffer[r_peaks], "ro")
-    plt.title("Detected R peaks" + detectors.get_detector_list()[i][0])
-    plt.ylabel("ECG/mV")
-    plt.xlabel("time/sec")
-    plt.savefig(results_dir / detectors.get_detector_list()[i][0] / " peaks.png")
-    # plt.show()
-    plt.close()
-
-    intervals = np.diff(r_ts)
-    heart_rate = 60.0 / intervals
-    plt.figure(figsize=(1000,1000), dpi=300)
-    plt.plot(r_ts[1:], heart_rate)
-    plt.title("Heart rate")
-    plt.xlabel("time/sec")
-    plt.ylabel("HR/BPM")
-    plt.savefig(results_dir / detectors.get_detector_list()[i][0] / " heart_rate.png")
-    # plt.show()
-    plt.close()
+#     intervals = np.diff(r_ts)
+#     heart_rate = 60.0 / intervals
+#     plt.figure(figsize=(1000,1000), dpi=300)
+#     plt.plot(r_ts[1:], heart_rate)
+#     plt.title("Heart rate")
+#     plt.xlabel("time/sec")
+#     plt.ylabel("HR/BPM")
+#     plt.savefig(results_dir / detectors.get_detector_list()[i][0] / " heart_rate.png")
+#     # plt.show()
+#     plt.close()
