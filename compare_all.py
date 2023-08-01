@@ -37,7 +37,7 @@ with open(file_path, "rb") as file:
             break
 
         # Unpack the two bytes into a short (16-bit integer)
-        short_value = struct.unpack('h', data)[0]
+        short_value = struct.unpack("h", data)[0]
 
         # Alternate between buffers
         if active_buffer == 0:
@@ -54,40 +54,42 @@ ecg_buffer = buffer_two
 # ecg_buffer = unfiltered_ecg
 
 filtered_buffer = np.array([], dtype=np.int16)
+avg_buffer = np.array([], dtype=np.int16)
 
-newvalue = 0
-total = 0
-count = 0
-maxCount = 5
-# maxCount = 250 * 60
-# tmp_buffer = np.array([], dtype=np.int16)
-# tmp_buffer = np.append(tmp_buffer, 0)
 
-tmp_buffer = collections.deque(maxlen = maxCount)
-# tmp_buffer.appendleft(0)
+# # Quick averager
+# newvalue = 0
+# total = 0
+# count = 0
+max_count = 5
+# # max_count = 250 * 60
+# # tmp_buffer = np.array([], dtype=np.int16)
+# # tmp_buffer = np.append(tmp_buffer, 0)
 
-# Quick averager
-for sample in ecg_buffer:
-    popped_value = 0
+# tmp_buffer = collections.deque(maxlen = max_count)
+# # tmp_buffer.appendleft(0)
 
-    if count >= maxCount:
-        popped_value = tmp_buffer.popleft()
-    else:
-        count += 1
-    total += sample - popped_value
+# for sample in ecg_buffer:
+#     popped_value = 0
 
-    tmp_buffer.append(sample)
+#     if count >= max_count:
+#         popped_value = tmp_buffer.popleft()
+#     else:
+#         count += 1
+#     total += sample - popped_value
 
-    avg = total / count
+#     tmp_buffer.append(sample)
 
-    filtered_value = sample - avg
+#     avg = total / count
 
-    filtered_buffer = np.append(filtered_buffer, filtered_value)
+#     filtered_value = sample - avg
 
-accumulator = 0
-tempAvg = 0
+#     filtered_buffer = np.append(filtered_buffer, filtered_value)
 
-# Rolling Average w/ accumulator
+
+# # Rolling Average w/ accumulator
+# accumulator = 0
+# tempAvg = 0
 # for sample in ecg_buffer:
 
 #     if count == 0:
@@ -99,19 +101,40 @@ tempAvg = 0
 #         tempAvg -= accumulator / count
 #         # Add newest value
 #         tempAvg += sample / count
-#         if count < maxCount:
+#         if count < max_count:
 #             count += 1
 #         accumulator = tempAvg
 
 #     filtered_buffer = np.append(filtered_buffer, sample - accumulator)
 
-plt.figure(figsize=(200,5))
+# Exponentially weighted moving average alternative
+count = 0
+old_avg = 0
+new_avg = 0
+max_count = 1024
+for sample in ecg_buffer:
+
+    if count < max_count:
+      count += 1
+
+    if count == 1:
+        old_avg = new_avg = sample
+    else:
+        new_avg = old_avg + (sample - old_avg) / count
+        old_avg = new_avg
+
+    filtered_buffer = np.append(filtered_buffer, sample - new_avg)
+
+if not os.path.isdir(results_dir):
+    os.makedirs(results_dir)
+
+plt.figure(figsize=(200, 5))
 t = np.linspace(0, len(filtered_buffer) / fs, len(filtered_buffer))
 plt.plot(t, filtered_buffer)
 plt.title("Filtered ECG")
 plt.ylabel("ECG/mV")
 plt.xlabel("time/sec")
-plt.savefig(results_dir / f'filtered({str(maxCount)}).png')
+plt.savefig(results_dir / f"filtered({str(max_count)}).png")
 # plt.show()
 plt.close()
 
